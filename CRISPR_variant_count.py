@@ -16,7 +16,7 @@ from ruffus.drmaa_wrapper import run_job, run_job_using_drmaa, error_drmaa_job
 from PIL import Image
 import string
 
-parser = argparse.ArgumentParser(prog="CRISPRpipe", version="0.0.1", description="produces sequence clusters from amplicon seq", formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser(prog="CRISPRpipe", version="0.0.2", description="produces sequence clusters from amplicon seq", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("-ri", "--readIn", dest="readdir", action="store", default=False, help="input read folder")
 parser.add_argument("-g", "--ref", dest="refID", action="store", default='GRCm38', help="genome version identifier")
 parser.add_argument("-tgt", "--targetInterval", dest="targetInterval", action="store", default=None, help="amplicon genomic interval")
@@ -252,7 +252,7 @@ def bam2bed(input_files,output_file):
     ii1=input_files[0]
     oo=output_file
     read_root=re.sub('.sorted.bam','',os.path.basename(ii1))
-    bshcmd=os.path.join(BEDpath,'bedtools')+' bamtobed -i ' + ii1 + ' > ' + oo
+    bshcmd=os.path.join(BEDpath,'bedtools')+' bamtobed -cigar -i ' + ii1 + ' > ' + oo
     logger.info(bshcmd)
     with open(os.path.join(bamout,"logs","%s.bam2bed.out" % read_root),'w+') as stdoutF, open(os.path.join(bamout,"logs","%s.bam2bed.err" % read_root),'w+') as stderrF:
         try:

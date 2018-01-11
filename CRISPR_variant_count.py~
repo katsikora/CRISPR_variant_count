@@ -16,7 +16,7 @@ from ruffus.drmaa_wrapper import run_job, run_job_using_drmaa, error_drmaa_job
 from PIL import Image
 import string
 
-parser = argparse.ArgumentParser(prog="CRISPRpipe", version="0.0.1", description="produces sequence clusters from amplicon seq", formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser(prog="CRISPRpipe", version="0.0.2", description="produces sequence clusters from amplicon seq", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("-ri", "--readIn", dest="readdir", action="store", default=False, help="input read folder")
 parser.add_argument("-g", "--ref", dest="refID", action="store", default='GRCm38', help="genome version identifier")
 parser.add_argument("-tgt", "--targetInterval", dest="targetInterval", action="store", default=None, help="amplicon genomic interval")
@@ -397,7 +397,7 @@ def R_get_cluster_counts(input_files,output_file):
     oo=output_file
     read_root=re.sub('.whitelist.dedup.fasta','',os.path.basename(ii))
     Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.1/cluster_counts.R ' + Rout + ' ' + idir
-    logger.info(bshcmd)
+    logger.info(Rcmd)
     with open(os.path.join(Rout,"logs","%s.clu_counts.out" % read_root),'w+') as stdoutF, open(os.path.join(Rout,"logs","%s.clu_counts.err" % read_root),'w+') as stderrF:
         try:
             stdout_res, stderr_res  = run_job(cmd_str           = Rcmd,
