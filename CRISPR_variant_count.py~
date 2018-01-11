@@ -252,7 +252,7 @@ def bam2bed(input_files,output_file):
     ii1=input_files[0]
     oo=output_file
     read_root=re.sub('.sorted.bam','',os.path.basename(ii1))
-    bshcmd=os.path.join(BEDpath,'bedtools')+' bamtobed -i ' + ii1 + ' > ' + oo
+    bshcmd=os.path.join(BEDpath,'bedtools')+' bamtobed -cigar -i ' + ii1 + ' > ' + oo
     logger.info(bshcmd)
     with open(os.path.join(bamout,"logs","%s.bam2bed.out" % read_root),'w+') as stdoutF, open(os.path.join(bamout,"logs","%s.bam2bed.err" % read_root),'w+') as stderrF:
         try:
@@ -279,7 +279,7 @@ def filter_bed(input_file,output_file):
     ii=input_file
     oo=output_file
     read_root=re.sub('.sorted.bed','',os.path.basename(ii))
-    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.1/filt_bed.R ' + bamout + ' ' + ii + ' ' + args.targetInterval + ' ;sleep 300'
+    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.2/filt_bed.R ' + bamout + ' ' + ii + ' ' + args.targetInterval + ' ;sleep 300'
     logger.info(Rcmd)
     with open(os.path.join(bamout,"logs","%s.bed_filt.out" % read_root),'w+') as stdoutF, open(os.path.join(bamout,"logs","%s.bed_filt.err" % read_root),'w+') as stderrF:
         try:
@@ -357,32 +357,6 @@ def fq2fa(input_file,output_file):
             logger.info('Fastq to fasta conversion complete')
          
             
-#### cluster identical sequences of the same length in the fasta file ######
-@transform(fq2fa,suffix('.whitelist.fasta'),'.whitelist.dedup.fasta',output_dir=seqout)
-def fa_clust(input_file,output_file):
-    ii=input_file
-    oo=output_file
-    read_root=re.sub('.whitelist.fasta','',os.path.basename(ii))
-    bshcmd=os.path.join(FASTXpath,'fastx_collapser')+ ' -i ' +ii + ' -o ' + oo + ' ; sleep 300'
-    logger.info(bshcmd)
-    with open(os.path.join(seqout,"logs","%s.fa_clust.out" % read_root),'w+') as stdoutF, open(os.path.join(seqout,"logs","%s.fa_clust.err" % read_root),'w+') as stderrF:
-        try:
-            stdout_res, stderr_res  = run_job(cmd_str           = bshcmd,
-                                          job_name          = 'fa_clust',
-                                          logger            = logger,
-                                          drmaa_session     = mySession,
-                                          run_locally       = False,
-                                          working_directory = os.getcwd(),
-                                          job_other_options = '-p bioinfo ')
-            stdoutF.write("".join(stdout_res))
-            stderrF.write("".join(stderr_res))
-
-        # relay all the stdout, stderr, drmaa output to diagnose failures
-        except error_drmaa_job as err:
-            logger.error("Fasta clustering error: %s" % err)
-            raise
-        else:
-            logger.info('Fasta clustering complete')
 
 ################# postprocess cluster counts in R #########################################
 Rout=os.path.join(wdir,'workspaceR')
@@ -390,13 +364,13 @@ if not os.path.exists(Rout):
     os.makedirs(Rout)
 os.chdir(Rout)
 @follows(mkdir(Rout),mkdir(os.path.join(Rout,'logs')))
-@merge(fa_clust,output=os.path.join(Rout,'Cluster.counts.txt'))
+@merge(fq2fa,output=os.path.join(Rout,'Cluster.counts.txt'))
 def R_get_cluster_counts(input_files,output_file):
     ii=input_files[1]
     idir=seqout
     oo=output_file
     read_root=re.sub('.whitelist.dedup.fasta','',os.path.basename(ii))
-    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.1/cluster_counts.R ' + Rout + ' ' + idir
+    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.2/cluster_counts.R ' + Rout + ' ' + idir
     logger.info(Rcmd)
     with open(os.path.join(Rout,"logs","%s.clu_counts.out" % read_root),'w+') as stdoutF, open(os.path.join(Rout,"logs","%s.clu_counts.err" % read_root),'w+') as stderrF:
         try:
