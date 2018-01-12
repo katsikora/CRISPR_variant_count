@@ -16,7 +16,7 @@ from ruffus.drmaa_wrapper import run_job, run_job_using_drmaa, error_drmaa_job
 from PIL import Image
 import string
 
-parser = argparse.ArgumentParser(prog="CRISPRpipe", version="0.0.2", description="produces sequence clusters from amplicon seq", formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser(prog="CRISPRpipe", version="0.0.3", description="produces sequence clusters from amplicon seq", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("-ri", "--readIn", dest="readdir", action="store", default=False, help="input read folder")
 parser.add_argument("-g", "--ref", dest="refID", action="store", default='GRCm38', help="genome version identifier")
 parser.add_argument("-tgt", "--targetInterval", dest="targetInterval", action="store", default=None, help="amplicon genomic interval")
@@ -279,7 +279,7 @@ def filter_bed(input_file,output_file):
     ii=input_file
     oo=output_file
     read_root=re.sub('.sorted.bed','',os.path.basename(ii))
-    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.2/filt_bed.R ' + bamout + ' ' + ii + ' ' + args.targetInterval + ' ;sleep 300'
+    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.3/filt_bed.R ' + bamout + ' ' + ii + ' ' + args.targetInterval + ' ;sleep 300'
     logger.info(Rcmd)
     with open(os.path.join(bamout,"logs","%s.bed_filt.out" % read_root),'w+') as stdoutF, open(os.path.join(bamout,"logs","%s.bed_filt.err" % read_root),'w+') as stderrF:
         try:
@@ -370,7 +370,7 @@ def R_get_cluster_counts(input_files,output_file):
     idir=seqout
     oo=output_file
     read_root=re.sub('.whitelist.fasta','',os.path.basename(ii))
-    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.2/cluster_counts.R ' + Rout + ' ' + idir
+    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.3/cluster_counts.R ' + Rout + ' ' + idir
     logger.info(Rcmd)
     with open(os.path.join(Rout,"logs","%s.clu_counts.out" % read_root),'w+') as stdoutF, open(os.path.join(Rout,"logs","%s.clu_counts.err" % read_root),'w+') as stderrF:
         try:

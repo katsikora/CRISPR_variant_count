@@ -31,26 +31,15 @@ for(i in seq_along(bedL)){
     bi.filt2<-bi.filt[bi.filt$CHR %in% "X",]
     bi.filt3<-bi.filt2[grep("S",bi.filt2$CIGAR,invert=TRUE),]
     bi.filt4<-bi.filt3[grep("H",bi.filt2$CIGAR,invert=TRUE),]
-    tabcig<-table(bi.filt4$CIGAR)
-    bi.filt5<-bi.filt4[bi.filt4$CIGAR %in% names(tabcig[as.numeric(tabcig)>=20]),]
-    tabi<-as.data.frame(table(bi.filt5$CIGAR),stringsAsFactors=FALSE)
+    tabi<-bi.filt4
     tabi$SampleID<-bedshort[i]
     tabi$Seq<-"NA"
-    tabi$SeqAb<-"NA"
-    
+        
     fi<-read.fasta(fxdir[i],seqtype="DNA",as.string=TRUE,forceDNAtolower=FALSE)
-    cu<-unique(tabi$Var1)
-    for(k in seq_along(cu)){
-        rnk<-bi.filt5$ReadName[bi.filt5$CIGAR %in% cu[k]]
-        fal<-fi[names(fi) %in% rnk]
-        tabseq<-table(unlist(fal))
-        tabfilt<-tabseq[tabseq>10]
-        if(length(tabfilt)>0){
-            tabi$Seq[k]<-paste(names(tabfilt),collapse=";")
-            tabi$SeqAb[k]<-paste(as.character(tabfilt),collapse=";")
-        }
-    }
+    fal<-unlist(fi[names(fi) %in% tabi$ReadName])
+    tabi$Seq<-fal[match(tabi$ReadName,names(fal))]
     cluLF[[i]]<-tabi
+    print(dim(tabi))
     print(paste0(i,"_processed"))
 }
 
@@ -58,35 +47,38 @@ save(cluLF,file="cluLF.RData")
 
 cludat<-rbindlist(cluLF)
 save(cludat,file="cludat.RData")
-write.table(cludat,file="Cluster.counts.txt",row.names=FALSE,sep="\t",quote=FALSE)
 
-subclu<-unlist(lapply(strsplit(cludat$SeqAb,split=";"),length))
 
-cigrv<-rep(cludat$Var1,subclu)
-freqrv<-rep(cludat$Freq,subclu)
-sidrv<-rep(cludat$SampleID,subclu)
-seqrv<-unlist(lapply(cludat$Seq,function(X)strsplit(X,split=";")))
-abrv<-unlist(lapply(cludat$SeqAb,function(X)strsplit(X,split=";")))
+##pattern match
+require(stringr)
+Seqloc<-str_locate(cludat$Seq, "GAAGGAGAT.+TGTGTGC")
+Seqsub<-substr(cludat$Seq,start=Seqloc[,"start"],stop=Seqloc[,"end"]) ###NAs introduced where no substring found
+cludat$Seqsub<-Seqsub
+save(cludat,file="cludat.RData")
 
-cludat2<-data.table(cigrv,freqrv,sidrv,seqrv,abrv)
-colnames(cludat2)<-c("CIGAR","Freq","SampleID","Seq","SeqAb")
-cludat2<-cludat2[!(cludat2$Seq=="NA"),]
-cludat2$CluID<-paste(cludat2$CIGAR,cludat2$Seq,sep="_")
-save(cludat2,file="cludat2.RData")
+#summarize counts/cluster and filter for min 10 seqs
+sumdat<-data.table(summarize(group_by(cludat,SampleID,Seqsub),Count=length(Seqsub)),stringsAsFactors=FALSE)
+sumdat$Length<-str_length(sumdat$Seqsub)
+##add a filtering step for length equal to WT or WT-1 -> 41 or 40nt
+sumdat.filt<-sumdat[sumdat$Count>=10&!(is.na(sumdat$Seqsub))&sumdat$Length!=40&sumdat$Length!=41,]
 
-clu2sum<-as.data.frame(table(cludat2$SampleID),stringsAsFactors=FALSE)
-write.table(clu2sum,file="Variant.counts.txt",row.names=FALSE,sep="\t",quote=FALSE)
+save(sumdat.filt,file="sumdat.filt.RData")
+write.table(sumdat.filt,file="Cluster.counts.txt",row.names=FALSE,sep="\t",quote=FALSE)
+
+
+vardat<-as.data.frame(summarize(group_by(sumdat.filt,SampleID),NVar=length(Seqsub)),stringsAsFactors=FALSE)
+write.table(vardat,file="Variant.counts.txt",row.names=FALSE,sep="\t",quote=FALSE)
 
 ##produce upset plot
 
 require(UpSetR)
 require(ggplot2)
 
-cluL2<-vector("list",length(unique(cludat2$SampleID)))
-names(cluL2)<-unique(cludat2$SampleID)
+cluL2<-vector("list",length(unique(sumdat.filt$SampleID)))
+names(cluL2)<-unique(sumdat.filt$SampleID)
 
 for(i in seq_along(cluL2)){
-    cluL2[[i]]<-cludat2$CluID[cludat2$SampleID %in% unique(cludat2$SampleID)[i]]
+    cluL2[[i]]<-cludat2$CluID[sumdat.filt$SampleID %in% unique(sumdat.filt$SampleID)[i]]
     print(paste0(i,"_processed"))
 
 }
