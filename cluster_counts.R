@@ -13,11 +13,11 @@ require(seqinr)
 require(dplyr)
 
 fxdir<-dir(fx,pattern="*.whitelist.fasta",full.names=TRUE)
-fxshort<-gsub(".whitelist.fasta","",basename(fxdir))
+fxshort<-gsub("_prin.whitelist.fasta","",basename(fxdir))
 
 #####start from bed file and cluster CIGAR strings
-bedIN<-dir(sub("filtered_sequences","bams",basename(fxdir)),pattern=".sorted.bed",full.names=TRUE)
-bedshort<-gsub(".sorted.bed","",basename(bedIN))
+bedIN<-dir(sub("filtered_sequences","bams",fx),pattern=".sorted.bed",full.names=TRUE)
+bedshort<-gsub("_prin.sorted.bed","",basename(bedIN))
 cluLF<-vector("list",length(bedIN))
 
 
