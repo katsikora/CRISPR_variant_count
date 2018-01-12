@@ -370,7 +370,7 @@ def R_get_cluster_counts(input_files,output_file):
     idir=seqout
     oo=output_file
     read_root=re.sub('.whitelist.fasta','',os.path.basename(ii))
-    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.2/cluster_counts.R ' + Rout + ' ' + idir
+    Rcmd=os.path.join(Rpath,'Rscript')+' --no-save --no-restore /data/boehm/group/pipelines/CRISPR_variant_counting/v0.0.3/cluster_counts.R ' + Rout + ' ' + idir
     logger.info(Rcmd)
     with open(os.path.join(Rout,"logs","%s.clu_counts.out" % read_root),'w+') as stdoutF, open(os.path.join(Rout,"logs","%s.clu_counts.err" % read_root),'w+') as stderrF:
         try:

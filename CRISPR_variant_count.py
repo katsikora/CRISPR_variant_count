@@ -380,7 +380,7 @@ def R_get_cluster_counts(input_files,output_file):
                                           drmaa_session     = mySession,
                                           run_locally       = False,
                                           working_directory = os.getcwd(),
-                                          job_other_options = '-p bioinfo ')
+                                          job_other_options = '-p bioinfo --mem-per-cpu=10000')
             stdoutF.write("".join(stdout_res))
             stderrF.write("".join(stderr_res))
 
