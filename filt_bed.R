@@ -11,7 +11,7 @@ message(sprintf("Processing %s",bedIN))
 require(data.table)
 
 bi<-fread(bedIN,header=FALSE,sep="\t")
-colnames(bi)<-c("CHR","START","END","ReadName","MAPQ","Strand")
+colnames(bi)<-c("CHR","START","END","ReadName","MAPQ","Strand","CIGAR")
 bi$Length<-bi$END-bi$START
 
 tgtInt<-commandArgs(trailingOnly=TRUE)[3]

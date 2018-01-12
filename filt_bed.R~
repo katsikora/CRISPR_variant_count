@@ -20,7 +20,7 @@ tgt.start<-gsub(".+:","",gsub("-.+","",tgtInt))
 tgt.end<-gsub(".+-","",tgtInt)
 tg.len<-as.numeric(tgt.end)-as.numeric(tgt.start)
 
-bi.filt<-bi[(bi$Length>=(tg.len-1) | bi$Length=<(tg.len+1)) & bi$CHR==tgt.chrom,]
+bi.filt<-bi[(bi$Length>=(tg.len-1) | bi$Length<=(tg.len+1)) & bi$CHR==tgt.chrom,]
 ts<-bi.filt$ReadName
 write.table(ts,file=gsub(".sorted.bed",".whitelist.txt",bedIN),row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
 
