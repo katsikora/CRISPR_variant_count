@@ -22,7 +22,7 @@ cluLF<-vector("list",length(bedIN))
 
 
 
-for(i in seq_along(bedL)){
+for(i in seq_along(cluLF)){
 
     bi<-fread(bedIN[i],header=FALSE,sep="\t")
     colnames(bi)<-c("CHR","START","END","ReadName","MAPQ","Strand","CIGAR")

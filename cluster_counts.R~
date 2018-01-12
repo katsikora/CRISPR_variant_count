@@ -74,11 +74,11 @@ write.table(vardat,file="Variant.counts.txt",row.names=FALSE,sep="\t",quote=FALS
 require(UpSetR)
 require(ggplot2)
 
-cluL2<-vector("list",length(unique(cludat2$SampleID)))
-names(cluL2)<-unique(cludat2$SampleID)
+cluL2<-vector("list",length(unique(sumdat.filt$SampleID)))
+names(cluL2)<-unique(sumdat.filt$SampleID)
 
 for(i in seq_along(cluL2)){
-    cluL2[[i]]<-cludat2$CluID[cludat2$SampleID %in% unique(cludat2$SampleID)[i]]
+    cluL2[[i]]<-cludat2$CluID[sumdat.filt$SampleID %in% unique(sumdat.filt$SampleID)[i]]
     print(paste0(i,"_processed"))
 
 }
