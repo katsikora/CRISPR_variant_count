@@ -78,7 +78,7 @@ cluL2<-vector("list",length(unique(sumdat.filt$SampleID)))
 names(cluL2)<-unique(sumdat.filt$SampleID)
 
 for(i in seq_along(cluL2)){
-    cluL2[[i]]<-cludat2$CluID[sumdat.filt$SampleID %in% unique(sumdat.filt$SampleID)[i]]
+    cluL2[[i]]<-sumdat.filt$CluID[sumdat.filt$SampleID %in% unique(sumdat.filt$SampleID)[i]]
     print(paste0(i,"_processed"))
 
 }

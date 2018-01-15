@@ -17,7 +17,7 @@ fxshort<-gsub("_prin.whitelist.fasta","",basename(fxdir))
 
 #####start from bed file and cluster CIGAR strings
 bedIN<-dir(sub("filtered_sequences","bams",fx),pattern=".sorted.bed",full.names=TRUE)
-bedshort<-gsub(".sorted.bed","",basename(bedIN))
+bedshort<-gsub("_prin.sorted.bed","",basename(bedIN))
 cluLF<-vector("list",length(bedIN))
 
 
@@ -78,7 +78,7 @@ cluL2<-vector("list",length(unique(sumdat.filt$SampleID)))
 names(cluL2)<-unique(sumdat.filt$SampleID)
 
 for(i in seq_along(cluL2)){
-    cluL2[[i]]<-cludat2$CluID[sumdat.filt$SampleID %in% unique(sumdat.filt$SampleID)[i]]
+    cluL2[[i]]<-sumdat.filt$CluID[sumdat.filt$SampleID %in% unique(sumdat.filt$SampleID)[i]]
     print(paste0(i,"_processed"))
 
 }
